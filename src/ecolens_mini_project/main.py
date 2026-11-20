@@ -360,7 +360,7 @@ def get_local_ip() -> str:
 
 def run():
     """Entry point for `uv run ecolens`."""
-    threading.Thread(target=camera_loop, daemon=True).start()
+    # threading.Thread(target=camera_loop, daemon=True).start()
     threading.Thread(target=voice_listener, daemon=True).start()
 
     ip = get_local_ip()
