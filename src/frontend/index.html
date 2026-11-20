@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoLens — AI Waste Classifier & 5R Assistant</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+  <!-- Floating Glassmorphic Pill Navbar with Sliding Tab Indicator -->
+  <header class="floating-nav-wrap">
+    <nav class="floating-nav">
+      <a href="#scanner" class="brand">
+        <span class="brand-dot"></span>
+        EcoLens
+      </a>
+
+      <div class="nav-links" id="nav-links">
+        <div class="nav-indicator" id="nav-indicator"></div>
+        <a href="#scanner" class="nav-item active" data-section="scanner">Live Scanner</a>
+        <a href="#framework" class="nav-item" data-section="framework">5R Framework</a>
+        <a href="#history" class="nav-item" data-section="history">Scan History</a>
+      </div>
+
+      <div class="nav-controls">
+        <select id="city-select" class="city-select" aria-label="Select City">
+          <option value="Delhi" selected>Delhi</option>
+          <option value="Greater Noida">Greater Noida</option>
+          <option value="Mumbai">Mumbai</option>
+          <option value="Bengaluru">Bengaluru</option>
+        </select>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- SECTION 1: LIVE SCANNER -->
+    <section id="scanner" class="section">
+      <div class="section-header">
+        <h1>AI Waste Classifier</h1>
+        <p>Identify mixed waste in real time using Gemini 2.5 Flash with 5R classification and local disposal tips.</p>
+      </div>
+
+      <div class="scanner-grid">
+        <!-- Left Column: Camera / Upload Feed -->
+        <div class="card feed-card">
+          <div class="mode-tabs">
+            <button class="mode-btn active" id="btn-mode-live">Live Webcam</button>
+            <button class="mode-btn" id="btn-mode-upload">Upload Image</button>
+          </div>
+
+          <div class="viewport" id="live-viewport">
+            <img src="/feed" alt="Live Webcam Feed" id="camera-stream" />
+            <div class="live-badge"><span class="pulse"></span> LIVE</div>
+          </div>
+
+          <div class="viewport upload-viewport hidden" id="upload-viewport">
+            <input type="file" id="file-input" accept="image/*" hidden />
+            <img id="upload-preview" class="hidden" alt="Upload Preview" />
+            <div class="upload-placeholder" id="upload-placeholder">
+              <p>Drag & drop a waste photo here, or <span>browse</span></p>
+            </div>
+          </div>
+
+          <div class="action-bar">
+            <button class="btn btn-primary" id="btn-scan">Scan Waste</button>
+            <button class="btn btn-secondary" id="btn-save">Save Log</button>
+            <button class="btn btn-ghost" id="btn-clear">Clear</button>
+          </div>
+
+          <div class="status-strip">
+            <span id="status-text">Ready — point camera or upload an image</span>
+            <span id="voice-status" class="voice-pill">Mic: initializing...</span>
+          </div>
+        </div>
+
+        <!-- Right Column: Analysis Results -->
+        <div class="card results-card">
+          <div class="results-header">
+            <h2>Detected Items</h2>
+            <span id="scan-time" class="muted">--:--:--</span>
+          </div>
+          <div id="results-container" class="results-list">
+            <div class="empty-state">
+              No items scanned yet. Click <strong>Scan Waste</strong> or say <code>"scan"</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: 5R FRAMEWORK -->
+    <section id="framework" class="section">
+      <div class="section-header">
+        <h2>The 5R Circular Framework</h2>
+        <p>EcoLens classifies every detected object into the highest-value sustainability tier.</p>
+      </div>
+      <div class="five-r-grid">
+        <div class="r-card border-refuse"><h3>Refuse</h3><p>Avoid single-use plastics, styrofoam, and unnecessary packaging.</p></div>
+        <div class="r-card border-reduce"><h3>Reduce</h3><p>Minimize consumption of multi-layer wrappers and disposables.</p></div>
+        <div class="r-card border-reuse"><h3>Reuse</h3><p>Repurpose glass jars, cardboard boxes, and durable containers.</p></div>
+        <div class="r-card border-recycle"><h3>Recycle</h3><p>Clean PET bottles, aluminum cans, and paper into blue bins.</p></div>
+        <div class="r-card border-rot"><h3>Rot</h3><p>Compost organic food scraps and biodegradable garden waste.</p></div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: SCAN HISTORY -->
+    <section id="history" class="section">
+      <div class="section-header row-between">
+        <div>
+          <h2>Scan History</h2>
+          <p>Persisted locally in <code>scan_history.json</code>.</p>
+        </div>
+        <button class="btn btn-danger" id="btn-clear-history">Clear All History</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val" id="stat-scans">0</div><div class="stat-lbl">Saved Scans</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-items">0</div><div class="stat-lbl">Total Items</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-recyclable">0</div><div class="stat-lbl">Recyclable</div></div>
+      </div>
+
+      <div id="history-list" class="history-list"></div>
+    </section>
+  </main>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
