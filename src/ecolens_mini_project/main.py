@@ -1,5 +1,5 @@
 """
-EcoLens Backend Server (Flask + OpenCV + Non-Blocking AI + Strict Voice + Safe TTS).
+EcoLens Backend Server (Flask + Non-Blocking AI + Strict Voice + Safe TTS).
 Serves the desktop website from src/frontend/ and exposes REST & MJPEG endpoints.
 """
 import base64
@@ -45,6 +45,7 @@ app_state = {
     "status": "Ready",
     "is_scanning": False,
     "city": DEFAULT_CITY,
+    "last_image_bytes": None,
 }
 
 mic_status = {
@@ -90,18 +91,21 @@ def speak(text: str):
 
 
 # ─────────────────────────────────────────────
-#  BACKGROUND WEBCAM CAPTURE THREAD
+#  BACKGROUND WEBCAM CAPTURE THREAD (OPTIONAL)
+#  Kept disabled by default so the browser's Start Webcam
+#  button can claim the camera without device lock conflicts.
 # ─────────────────────────────────────────────
 def camera_loop():
     """Continuously captures webcam frames in the background at ~30 FPS."""
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
-        print("  [WARN] No webcam detected. Image upload mode still works.")
+        print("  [WARN] No webcam detected. Browser webcam & image upload still work.")
         return
 
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-    camera_state["active"] = True
+    with state_lock:
+        camera_state["active"] = True
 
     while True:
         ret, frame = cap.read()
@@ -121,21 +125,20 @@ def camera_loop():
 #  CORE ACTIONS (SCAN / SAVE / CLEAR)
 # ─────────────────────────────────────────────
 def trigger_scan(image_bytes: bytes | None = None, city: str | None = None):
-    """Runs Gemini vision analysis in a background thread so video never freezes."""
+    """Runs Gemini vision analysis in a background thread so the server never blocks."""
     with state_lock:
         if app_state["is_scanning"]:
             return
-        app_state["is_scanning"] = True
-        app_state["status"] = "Analyzing with Gemini 2.5 Flash..."
-        target_city = city or app_state["city"]
         if image_bytes is None:
             image_bytes = camera_state["jpeg_bytes"]
+        if not image_bytes:
+            app_state["status"] = "No image or camera frame received"
+            return
 
-    if not image_bytes:
-        with state_lock:
-            app_state["is_scanning"] = False
-            app_state["status"] = "No camera frame available"
-        return
+        app_state["is_scanning"] = True
+        app_state["status"] = "Analyzing with Gemini 2.5 Flash..."
+        app_state["last_image_bytes"] = image_bytes
+        target_city = city or app_state["city"]
 
     def _worker():
         speak("Scanning now.")
@@ -166,10 +169,15 @@ def trigger_scan(image_bytes: bytes | None = None, city: str | None = None):
 
 
 def save_current_scan() -> bool:
-    """Saves the latest scan results and snapshot to scan_history.json."""
+    """Saves the latest scan results and snapshot image to scan_history.json."""
     with state_lock:
         results = list(app_state["results"])
-        frame = camera_state["frame_bgr"].copy() if camera_state["frame_bgr"] is not None else None
+        last_bytes = app_state.get("last_image_bytes")
+        frame = (
+            camera_state["frame_bgr"].copy()
+            if camera_state["frame_bgr"] is not None
+            else None
+        )
         city = app_state["city"]
 
     if not results:
@@ -177,23 +185,29 @@ def save_current_scan() -> bool:
 
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     img_name = f"scan_{ts}.jpg"
-    if frame is not None:
-        cv2.imwrite(str(SCANS_DIR / img_name), frame)
+    img_path = SCANS_DIR / img_name
 
-    history = []
-    if LOG_FILE.exists():
-        with open(LOG_FILE, "r", encoding="utf-8") as f:
-            history = json.load(f)
+    if last_bytes:
+        with open(img_path, "wb") as img_file:
+            img_file.write(last_bytes)
+    elif frame is not None:
+        cv2.imwrite(str(img_path), frame)
 
-    history.append({
-        "timestamp": ts,
-        "city": city,
-        "image": img_name,
-        "results": results,
-    })
+    with state_lock:
+        history = []
+        if LOG_FILE.exists():
+            with open(LOG_FILE, "r", encoding="utf-8") as f:
+                history = json.load(f)
 
-    with open(LOG_FILE, "w", encoding="utf-8") as f:
-        json.dump(history, f, indent=2)
+        history.append({
+            "timestamp": ts,
+            "city": city,
+            "image": img_name,
+            "results": results,
+        })
+
+        with open(LOG_FILE, "w", encoding="utf-8") as f:
+            json.dump(history, f, indent=2)
 
     speak("Scan saved.")
     return True
@@ -215,7 +229,8 @@ def voice_listener():
     try:
         with sr.Microphone() as source:
             recognizer.adjust_for_ambient_noise(source, duration=1)
-            mic_status["listening"] = True
+            with state_lock:
+                mic_status["listening"] = True
             print("  [VOICE] Strict mode active: scan | save | clear | history | quit")
 
             while True:
@@ -235,8 +250,9 @@ def voice_listener():
 
                     if first_word in VOICE_COMMANDS:
                         cmd = VOICE_COMMANDS[first_word]
-                        mic_status["last_heard"] = first_word
-                        mic_status["last_status"] = "ok"
+                        with state_lock:
+                            mic_status["last_heard"] = first_word
+                            mic_status["last_status"] = "ok"
                         if cmd == "scan":
                             trigger_scan()
                         elif cmd == "save":
@@ -248,15 +264,18 @@ def voice_listener():
                                 app_state["status"] = "Cleared"
                             speak("Cleared.")
                     else:
-                        mic_status["last_heard"] = text[:30]
-                        mic_status["last_status"] = "rejected"
+                        with state_lock:
+                            mic_status["last_heard"] = text[:30]
+                            mic_status["last_status"] = "rejected"
                 except (sr.WaitTimeoutError, sr.UnknownValueError):
                     pass
                 except sr.RequestError:
-                    mic_status["listening"] = False
+                    with state_lock:
+                        mic_status["listening"] = False
                     break
     except Exception as exc:
-        mic_status["listening"] = False
+        with state_lock:
+            mic_status["listening"] = False
         print(f"  [VOICE] Mic unavailable ({exc}). Web controls still work.")
 
 
@@ -286,12 +305,12 @@ def video_feed():
 
 @app.route("/api/scan", methods=["POST"])
 def api_scan():
-    city = request.form.get("city") or (request.json.get("city") if request.is_json else None)
+    json_body = request.get_json(silent=True) or {}
+    city = request.form.get("city") or json_body.get("city")
     if city:
         with state_lock:
             app_state["city"] = city
 
-    # Support either uploaded image file OR live webcam capture
     if "image" in request.files:
         image_bytes = request.files["image"].read()
         trigger_scan(image_bytes=image_bytes, city=city)
@@ -304,7 +323,10 @@ def api_scan():
 @app.route("/api/save", methods=["POST"])
 def api_save():
     saved = save_current_scan()
-    return jsonify({"saved": saved, "status": "Saved to history" if saved else "Nothing to save"})
+    return jsonify({
+        "saved": saved,
+        "status": "Saved to history" if saved else "Nothing to save",
+    })
 
 
 @app.route("/api/clear", methods=["POST"])
@@ -312,6 +334,7 @@ def api_clear():
     with state_lock:
         app_state["results"] = []
         app_state["scan_time"] = ""
+        app_state["last_image_bytes"] = None
         app_state["status"] = "Ready"
     return jsonify({"status": "Cleared"})
 
@@ -330,21 +353,23 @@ def api_results():
 
 @app.route("/api/history", methods=["GET", "DELETE"])
 def api_history():
-    if request.method == "DELETE":
-        if LOG_FILE.exists():
-            os.remove(LOG_FILE)
-        return jsonify({"status": "cleared"})
+    with state_lock:
+        if request.method == "DELETE":
+            if LOG_FILE.exists():
+                os.remove(LOG_FILE)
+            return jsonify({"status": "cleared"})
 
-    entries = []
-    if LOG_FILE.exists():
-        with open(LOG_FILE, "r", encoding="utf-8") as f:
-            entries = json.load(f)
-    return jsonify({"history": entries})
+        entries = []
+        if LOG_FILE.exists():
+            with open(LOG_FILE, "r", encoding="utf-8") as f:
+                entries = json.load(f)
+        return jsonify({"history": entries})
 
 
 @app.route("/api/voice_status")
 def api_voice_status():
-    return jsonify(mic_status)
+    with state_lock:
+        return jsonify(dict(mic_status))
 
 
 def get_local_ip() -> str:

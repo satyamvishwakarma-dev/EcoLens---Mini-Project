@@ -56,6 +56,14 @@ const CITY_TIPS = {
   }
 };
 
+const CO2_BY_CATEGORY = {
+  Refuse:  0.42,
+  Reuse:   0.31,
+  Recycle: 0.18,
+  Rot:     0.14,
+  Reduce:  0.09
+};
+
 function getDemoItemsForCity(city) {
   const tips = CITY_TIPS[city] || CITY_TIPS["Delhi"];
   return [
@@ -119,7 +127,7 @@ const CAT_STYLES = {
 };
 
 // ─────────────────────────────────────────────
-// 2. APPLICATION STATE & LOCALSTORAGE
+// 2. APPLICATION STATE & HISTORY SYNC
 // ─────────────────────────────────────────────
 const STORAGE_KEY = 'ecolens_web_history_v1';
 let currentCity    = 'Delhi';
@@ -131,7 +139,13 @@ let uploadedFile   = null;
 let currentResults = [];
 let scanHistory    = [];
 
-function loadHistoryFromStorage() {
+function saveHistoryToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(scanHistory));
+  } catch (e) {}
+}
+
+function loadHistoryFromStorageFallback() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -139,56 +153,37 @@ function loadHistoryFromStorage() {
       return;
     }
   } catch (e) {}
-
-  scanHistory = [
-    {
-      id: 'seed-101',
-      timestamp: '2026-11-19 18:24:10',
-      city: 'Delhi',
-      source: 'Demo Pile',
-      results: getDemoItemsForCity('Delhi').slice(0, 3)
-    },
-    {
-      id: 'seed-102',
-      timestamp: '2026-11-20 09:12:45',
-      city: 'Delhi',
-      source: 'Webcam Scan',
-      results: [
-        {
-          item: "Glass Pickle Jar (500g)",
-          category: "Reuse",
-          co2: 0.31,
-          reason: "Infinitely recyclable, non-toxic, airtight pantry container.",
-          reuse_ideas: ["Store dry lentils or spices", "Overnight oats jar", "Desk pen holder"],
-          local_tip: "Wash and reuse at home; if broken, wrap in newspaper before placing in MCD Blue Bin."
-        },
-        {
-          item: "Corrugated Delivery Box",
-          category: "Recycle",
-          co2: 0.25,
-          reason: "Clean kraft paper fibers can be recycled up to 7 times.",
-          reuse_ideas: ["Flatten for closet storage", "Shred as brown carbon for compost", "Floor mat for painting"],
-          local_tip: "Remove plastic tape, flatten, and hand over to your local Delhi raddi-wala."
-        }
-      ]
-    }
-  ];
-  saveHistoryToStorage();
+  scanHistory = [];
 }
 
-function saveHistoryToStorage() {
+async function loadHistoryFromBackend() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(scanHistory));
-  } catch (e) {}
+    const res = await fetch('/api/history');
+    if (!res.ok) throw new Error('Backend history unavailable');
+    const data = await res.json();
+    scanHistory = (data.history || []).map((entry, idx) => ({
+      id: entry.timestamp ? `${entry.timestamp}-${idx}` : `scan-${idx}`,
+      timestamp: entry.timestamp || '',
+      city: entry.city || currentCity,
+      source: entry.image || 'Live Scan',
+      results: (entry.results || []).map(item => ({
+        ...item,
+        co2: item.co2 ?? CO2_BY_CATEGORY[item.category] ?? 0.15
+      }))
+    }));
+    saveHistoryToStorage();
+  } catch (e) {
+    loadHistoryFromStorageFallback();
+  }
+  renderHistoryDashboard();
 }
 
 // ─────────────────────────────────────────────
 // 3. INITIALIZATION & DRAG-AND-DROP
 // ─────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  loadHistoryFromStorage();
+  loadHistoryFromBackend();
   render5RGuide();
-  renderHistoryDashboard();
   setupDragAndDrop();
   initFloatingNavIndicator();
 });
@@ -312,6 +307,7 @@ async function startWebcam() {
     document.getElementById('uploaded-preview').classList.add('hidden');
 
     currentMode = 'webcam';
+    uploadedFile = null;
     labelEl.textContent = 'Stop Webcam';
     document.getElementById('viewport-mode-badge').textContent = 'LIVE WEBCAM • 16:9';
     showToast('Webcam connected — click Scan Waste');
@@ -406,6 +402,24 @@ function simulateVoice(phrase) {
   }
 }
 
+function captureWebcamBlob() {
+  return new Promise((resolve, reject) => {
+    const video = document.getElementById('webcam-video');
+    if (!video || !video.videoWidth || !video.videoHeight) {
+      return reject(new Error('Webcam frame not ready yet'));
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error('Failed to capture webcam frame'));
+    }, 'image/jpeg', 0.9);
+  });
+}
+
 async function runScan() {
   if (isScanning) return;
   isScanning = true;
@@ -420,42 +434,64 @@ async function runScan() {
   pill.classList.add('text-emeraldAccent');
 
   try {
-    // If user uploaded an image and backend is reachable, send it to /api/scan
-    if (currentMode === 'upload' && uploadedFile) {
-      const fd = new FormData();
-      fd.append('image', uploadedFile);
-      fd.append('city', currentCity);
-      const res = await fetch('/api/scan', { method: 'POST', body: fd });
-      if (res.ok) {
-        await new Promise(r => setTimeout(r, 1500));
-        const rData = await fetch('/api/results').then(r => r.json());
-        if (Array.isArray(rData.results) && rData.results.length > 0) {
-          currentResults = rData.results;
-        } else {
-          currentResults = getDemoItemsForCity(currentCity);
-        }
-      } else {
-        currentResults = getDemoItemsForCity(currentCity);
-      }
-    } else {
-      await new Promise(r => setTimeout(r, 1200));
+    if (currentMode === 'demo') {
+      await new Promise(r => setTimeout(r, 900));
       currentResults = getDemoItemsForCity(currentCity);
+      if (bboxVisible) ov.classList.remove('opacity-0');
+    } else {
+      const fd = new FormData();
+      fd.append('city', currentCity);
+
+      if (currentMode === 'webcam') {
+        const blob = await captureWebcamBlob();
+        fd.append('image', blob, 'webcam_frame.jpg');
+      } else if (currentMode === 'upload' && uploadedFile) {
+        fd.append('image', uploadedFile);
+      } else {
+        throw new Error('Select an image or start the webcam first');
+      }
+
+      const startRes = await fetch('/api/scan', { method: 'POST', body: fd });
+      if (!startRes.ok) {
+        throw new Error(`Scan request failed (${startRes.status})`);
+      }
+
+      let rData = null;
+      for (let i = 0; i < 40; i++) {
+        await new Promise(r => setTimeout(r, 500));
+        rData = await fetch('/api/results').then(r => r.json());
+        if (!rData.is_scanning) break;
+      }
+
+      if (!rData || rData.is_scanning) {
+        throw new Error('Gemini analysis timed out');
+      }
+      if (rData.status && rData.status.startsWith('Scan error')) {
+        throw new Error(rData.status);
+      }
+
+      currentResults = (rData.results || []).map(item => ({
+        ...item,
+        co2: item.co2 ?? CO2_BY_CATEGORY[item.category] ?? 0.15
+      }));
     }
-  } catch {
-    currentResults = getDemoItemsForCity(currentCity);
+
+    const nowTime = new Date().toTimeString().split(' ')[0];
+    pill.textContent = `Scanned at ${nowTime} • ${currentResults.length} items`;
+    renderResultsPanel(currentResults, nowTime);
+    showToast(
+      currentResults.length
+        ? `Classified ${currentResults.length} waste items`
+        : 'No waste items detected'
+    );
+  } catch (err) {
+    console.error(err);
+    pill.textContent = 'Scan failed';
+    showToast(err.message || 'Scan failed — check backend logs');
   } finally {
     laser.classList.add('hidden');
     isScanning = false;
   }
-
-  if (bboxVisible && currentMode === 'demo') {
-    ov.classList.remove('opacity-0');
-  }
-
-  const nowTime = new Date().toTimeString().split(' ')[0];
-  pill.textContent = `Scanned at ${nowTime} • ${currentResults.length} items`;
-  renderResultsPanel(currentResults, nowTime);
-  showToast(`Classified ${currentResults.length} waste items`);
 }
 
 async function saveCurrentScan() {
@@ -481,15 +517,17 @@ async function saveCurrentScan() {
   saveHistoryToStorage();
   renderHistoryDashboard();
 
-  // Best-effort sync to backend /api/save if running under Flask
   try {
-    await fetch('/api/save', { method: 'POST' });
+    const res = await fetch('/api/save', { method: 'POST' });
+    if (res.ok) {
+      await loadHistoryFromBackend();
+    }
   } catch {}
 
-  showToast('Scan saved to History & localStorage!');
+  showToast('Scan saved to History!');
 }
 
-function clearResults() {
+async function clearResults() {
   currentResults = [];
   document.getElementById('bbox-overlay').classList.add('opacity-0');
   document.getElementById('viewport-status-pill').textContent = 'Ready to Scan';
@@ -502,6 +540,10 @@ function clearResults() {
       <p class="text-xs text-gray-400 mt-1.5 max-w-xs">Click <strong class="text-emeraldAccent">Scan Waste</strong> to analyze the active viewport.</p>
     </div>
   `;
+
+  try {
+    await fetch('/api/clear', { method: 'POST' });
+  } catch {}
 }
 
 // ─────────────────────────────────────────────
@@ -512,6 +554,16 @@ function renderResultsPanel(items, scanTime) {
   document.getElementById('results-count-badge').textContent = `${items.length} items`;
   document.getElementById('results-subtitle').textContent = `Last scan: ${scanTime} • City: ${currentCity}`;
   panel.innerHTML = '';
+
+  if (!items.length) {
+    panel.innerHTML = `
+      <div class="h-full min-h-[340px] flex flex-col items-center justify-center text-center p-6 animate-card">
+        <h4 class="text-base font-bold text-white">No Waste Items Detected</h4>
+        <p class="text-xs text-gray-400 mt-1.5 max-w-xs">Try another angle or upload a clearer photo of the items.</p>
+      </div>
+    `;
+    return;
+  }
 
   items.forEach((item, idx) => {
     const st = CAT_STYLES[item.category] || CAT_STYLES.Recycle;
@@ -596,7 +648,7 @@ function changeCity(newCity) {
 
   render5RGuide();
 
-  if (currentResults.length > 0) {
+  if (currentResults.length > 0 && currentMode === 'demo') {
     currentResults = getDemoItemsForCity(currentCity);
     renderResultsPanel(currentResults, new Date().toTimeString().split(' ')[0]);
   }
@@ -615,7 +667,7 @@ function renderHistoryDashboard() {
   scanHistory.forEach(entry => {
     (entry.results || []).forEach(it => {
       totalItems++;
-      totalCo2 += (it.co2 || 0.15);
+      totalCo2 += (it.co2 ?? CO2_BY_CATEGORY[it.category] ?? 0.15);
     });
   });
 
@@ -650,7 +702,7 @@ function renderHistoryDashboard() {
             <span class="w-2.5 h-2.5 rounded-full shrink-0 ${st.dot}"></span>
             <div>
               <div class="text-xs font-semibold text-white">${it.item}</div>
-              <div class="text-[11px] text-gray-400">${it.local_tip}</div>
+              <div class="text-[11px] text-gray-400">${it.local_tip || ''}</div>
             </div>
           </div>
           <span class="font-mono text-[10px] font-bold uppercase text-gray-400 shrink-0">${it.category}</span>
