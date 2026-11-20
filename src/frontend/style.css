@@ -7,6 +7,10 @@
 
 body {
   background-color: #090C0E;
+  background-image:
+    radial-gradient(ellipse 68% 36% at 50% -2%, rgba(0, 230, 118, 0.14), transparent 72%),
+    radial-gradient(ellipse 46% 30% at 82% 4%, rgba(0, 188, 212, 0.09), transparent 68%);
+  background-repeat: no-repeat;
   color: #F3F6F8;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
@@ -14,9 +18,7 @@ body {
 
 /* Subtle ambient background grid & glow */
 .hero-glow {
-  background-image:
-    radial-gradient(ellipse 60% 45% at 50% 0%, rgba(0, 230, 118, 0.11), transparent 70%),
-    radial-gradient(ellipse 40% 35% at 85% 15%, rgba(0, 188, 212, 0.08), transparent 65%);
+  background-image: none;
 }
 
 /* Laser sweep animation during scan */
@@ -84,11 +86,11 @@ body {
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(1160px, calc(100% - 32px));
+  width: min(1360px, calc(100% - 32px));
   z-index: 1000;
-  background: rgba(14, 19, 23, 0.82);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  /* background: rgba(14, 19, 23, 0.82); */
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 999px;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
