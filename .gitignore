@@ -12,3 +12,4 @@ wheels/
 
 
 saved_scans/
+*.json

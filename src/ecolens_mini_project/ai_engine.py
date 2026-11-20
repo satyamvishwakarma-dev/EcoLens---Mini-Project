@@ -2,13 +2,14 @@
 Gemini Vision Engine with Structured JSON Output, 2D Bounding Boxes,
 Low Thinking Latency, and Automatic 503/429 Model Fallback.
 """
+
 import json
 import time
 from typing import Literal
 from pydantic import BaseModel, Field
 from google import genai  # type: ignore
-from google.genai import types # type: ignore
-from google.genai.errors import APIError # type: ignore
+from google.genai import types  # type: ignore
+from google.genai.errors import APIError  # type: ignore
 
 from ecolens_mini_project.config import API_KEY, MODEL_NAME
 
@@ -35,14 +36,23 @@ class EcoLensAI:
             api_key=API_KEY,
             http_options=types.HttpOptions(
                 api_version="v1beta",
-                timeout=20000,  # 20s per request so it never hangs indefinitely
+                timeout=120000,  # 2 minutes (use 300000 for 5 minutes)
             ),
         )
         self.fallback_models = list(
-            dict.fromkeys([MODEL_NAME, "gemini-3.5-flash-lite", "gemini-2.5-flash"])
+            dict.fromkeys(
+                [
+                    MODEL_NAME,
+                    "gemini-3.5-flash-lite",
+                    "gemini-3.8-flash",
+                    "gemini-2.5-flash",
+                ]
+            )
         )
 
-    def analyze_image_bytes(self, image_bytes: bytes, city: str = "Delhi") -> list[dict]:
+    def analyze_image_bytes(
+        self, image_bytes: bytes, city: str = "Delhi"
+    ) -> list[dict]:
         """Sends JPEG bytes to Gemini with low thinking level and fast fallback."""
         prompt = f"""
         You are EcoLens, an expert waste management AI.
@@ -66,7 +76,9 @@ class EcoLensAI:
                         model=model_id,
                         contents=[
                             prompt,
-                            types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg"),
+                            types.Part.from_bytes(
+                                data=image_bytes, mime_type="image/jpeg"
+                            ),
                         ],
                         config=types.GenerateContentConfig(
                             response_mime_type="application/json",

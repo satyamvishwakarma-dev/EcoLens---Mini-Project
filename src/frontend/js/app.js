@@ -3,73 +3,73 @@
 // ─────────────────────────────────────────────
 const CITY_TIPS = {
   "Delhi": {
-    pet:     "Crush flat and drop in an NDMC/MCD Blue Dry Bin or sell to a local Delhi Kabadiwala.",
-    cup:     "Carry a steel tumbler to Delhi cafes; PE-lined cups belong in Black Residual Bins.",
-    peel:    "Compost in a balcony Khamba pot or hand over in MCD Green Wet Waste bins.",
+    pet: "Crush flat and drop in an NDMC/MCD Blue Dry Bin or sell to a local Delhi Kabadiwala.",
+    cup: "Carry a steel tumbler to Delhi cafes; PE-lined cups belong in Black Residual Bins.",
+    peel: "Compost in a balcony Khamba pot or hand over in MCD Green Wet Waste bins.",
     battery: "Drop at CPCB-authorized e-waste bins at Croma (CP / South Ex) or schedule Karo Sambhav pickup.",
     guide: {
-      Refuse:  "Reject single-use plastic bags & toxic e-waste in household trash; use Croma / Karo Sambhav e-bins.",
-      Reduce:  "Switch from PE-lined disposable coffee cups to reusable steel tumblers at Delhi metro cafes.",
-      Reuse:   "Repurpose glass pickle jars and tin containers for kitchen storage or desk organizers.",
+      Refuse: "Reject single-use plastic bags & toxic e-waste in household trash; use Croma / Karo Sambhav e-bins.",
+      Reduce: "Switch from PE-lined disposable coffee cups to reusable steel tumblers at Delhi metro cafes.",
+      Reuse: "Repurpose glass pickle jars and tin containers for kitchen storage or desk organizers.",
       Recycle: "Segregate clean PET #1 bottles & cardboard into NDMC/MCD Blue Bins or local Kabadiwalas.",
-      Rot:     "Turn kitchen scraps into compost via RWA composters or MCD Green Wet Waste collection."
+      Rot: "Turn kitchen scraps into compost via RWA composters or MCD Green Wet Waste collection."
     }
   },
   "Greater Noida": {
-    pet:     "Drop clean PET bottles in GNIDA Blue Dry Bins or hand over to society scrap collectors in Knowledge Park / Pari Chowk.",
-    cup:     "Avoid PE-lined disposable cups at campus canteens; dispose used ones in Black Residual Bins.",
-    peel:    "Place in GNIDA Green Wet Waste bins or residential society aerobic compost pits.",
+    pet: "Drop clean PET bottles in GNIDA Blue Dry Bins or hand over to society scrap collectors in Knowledge Park / Pari Chowk.",
+    cup: "Avoid PE-lined disposable cups at campus canteens; dispose used ones in Black Residual Bins.",
+    peel: "Place in GNIDA Green Wet Waste bins or residential society aerobic compost pits.",
     battery: "Drop spent cells at authorized e-waste collection points in Alpha/Beta Commercial Belts or Croma Greater Noida.",
     guide: {
-      Refuse:  "Refuse single-use cutlery & polybags; route batteries to CPCB-authorized Greater Noida e-waste hubs.",
-      Reduce:  "Carry reusable bottles & tumblers across university campuses and tech parks.",
-      Reuse:   "Repurpose glass jars and cardboard delivery boxes before handing them to society raddi-walas.",
+      Refuse: "Refuse single-use cutlery & polybags; route batteries to CPCB-authorized Greater Noida e-waste hubs.",
+      Reduce: "Carry reusable bottles & tumblers across university campuses and tech parks.",
+      Reuse: "Repurpose glass jars and cardboard delivery boxes before handing them to society raddi-walas.",
       Recycle: "Sort paper, PET, and metal into GNIDA Blue Dry Waste bins for MRF recovery.",
-      Rot:     "Feed wet kitchen organics into society OWC (Organic Waste Converters) or GNIDA Green Bins."
+      Rot: "Feed wet kitchen organics into society OWC (Organic Waste Converters) or GNIDA Green Bins."
     }
   },
   "Mumbai": {
-    pet:     "Deposit in BMC Dry Waste Centers, Bisleri Bottles for Change, or local Mumbai raddi-walas.",
-    cup:     "Use reusable cups at cafes; PE-lined paper cups cannot be pulped and go to BMC Reject Bins.",
-    peel:    "Segregate into BMC Green Wet Bins or society vermicomposting pits.",
+    pet: "Deposit in BMC Dry Waste Centers, Bisleri Bottles for Change, or local Mumbai raddi-walas.",
+    cup: "Use reusable cups at cafes; PE-lined paper cups cannot be pulped and go to BMC Reject Bins.",
+    peel: "Segregate into BMC Green Wet Bins or society vermicomposting pits.",
     battery: "Drop at BMC E-Waste collection vans or authorized Croma/Reliance Digital e-bins across Mumbai.",
     guide: {
-      Refuse:  "Strictly avoid banned single-use plastics under Maharashtra Plastic Ban; isolate e-waste.",
-      Reduce:  "Opt for refill packs and reusable dabbas to reduce landfill load on Deonar.",
-      Reuse:   "Donate usable household items through Mumbai RaddiConnect or local NGOs.",
+      Refuse: "Strictly avoid banned single-use plastics under Maharashtra Plastic Ban; isolate e-waste.",
+      Reduce: "Opt for refill packs and reusable dabbas to reduce landfill load on Deonar.",
+      Reuse: "Donate usable household items through Mumbai RaddiConnect or local NGOs.",
       Recycle: "Hand over clean dry recyclables to BMC Dry Waste Sorting Centers (DWCC).",
-      Rot:     "Compost wet waste in society pits or hand over daily to BMC Green Wet Waste vans."
+      Rot: "Compost wet waste in society pits or hand over daily to BMC Green Wet Waste vans."
     }
   },
   "Bengaluru": {
-    pet:     "Send clean PET bottles to BBMP Dry Waste Collection Centres (DWCC) or Hasiru Dala collectors.",
-    cup:     "Carry a steel tumbler to Bengaluru cafes; soiled PE-lined cups belong in Black Reject Bins.",
-    peel:    "Compost at home with Daily Dump Khamba pots or hand over in BBMP Green Wet Bins.",
+    pet: "Send clean PET bottles to BBMP Dry Waste Collection Centres (DWCC) or Hasiru Dala collectors.",
+    cup: "Carry a steel tumbler to Bengaluru cafes; soiled PE-lined cups belong in Black Reject Bins.",
+    peel: "Compost at home with Daily Dump Khamba pots or hand over in BBMP Green Wet Bins.",
     battery: "Drop spent batteries at Saahas Zero Waste Kasa Rasa centers or authorized e-waste bins.",
     guide: {
-      Refuse:  "Refuse multi-layer plastics and send batteries to Saahas / E-Parisaraa e-waste hubs.",
-      Reduce:  "Carry cloth bags and steel containers to Indiranagar/Koramangala zero-waste stores.",
-      Reuse:   "Donate electronics and jars via Bengaluru reuse networks and community thrift swaps.",
+      Refuse: "Refuse multi-layer plastics and send batteries to Saahas / E-Parisaraa e-waste hubs.",
+      Reduce: "Carry cloth bags and steel containers to Indiranagar/Koramangala zero-waste stores.",
+      Reuse: "Donate electronics and jars via Bengaluru reuse networks and community thrift swaps.",
       Recycle: "Use BBMP 2-bin-1-bag segregation; route dry waste directly to ward DWCCs.",
-      Rot:     "Turn kitchen scraps into compost using balcony Khamba pots or BBMP Green Bins."
+      Rot: "Turn kitchen scraps into compost using balcony Khamba pots or BBMP Green Bins."
     }
   }
 };
 
 const CO2_BY_CATEGORY = {
-  Refuse:  0.42,
-  Reuse:   0.31,
+  Refuse: 0.42,
+  Reuse: 0.31,
   Recycle: 0.18,
-  Rot:     0.14,
-  Reduce:  0.09
+  Rot: 0.14,
+  Reduce: 0.09
 };
 
 const BBOX_COLORS = {
   Recycle: { border: '#00BCD4', bg: 'rgba(0,188,212,0.14)' },
-  Reuse:   { border: '#4CAF50', bg: 'rgba(76,175,80,0.14)'  },
-  Rot:     { border: '#8BC34A', bg: 'rgba(139,195,74,0.14)' },
-  Refuse:  { border: '#F44336', bg: 'rgba(244,67,54,0.14)'  },
-  Reduce:  { border: '#FF9800', bg: 'rgba(255,152,0,0.14)'  },
+  Reuse: { border: '#4CAF50', bg: 'rgba(76,175,80,0.14)' },
+  Rot: { border: '#8BC34A', bg: 'rgba(139,195,74,0.14)' },
+  Refuse: { border: '#F44336', bg: 'rgba(244,67,54,0.14)' },
+  Reduce: { border: '#FF9800', bg: 'rgba(255,152,0,0.14)' },
 };
 
 function getDemoItemsForCity(city) {
@@ -132,31 +132,31 @@ function getDemoItemsForCity(city) {
 
 const CAT_STYLES = {
   Recycle: { border: 'border-l-catRecycle', top: 'border-t-catRecycle', badge: 'bg-catRecycle/15 text-catRecycle border-catRecycle/40', dot: 'bg-catRecycle' },
-  Reuse:   { border: 'border-l-catReuse',   top: 'border-t-catReuse',   badge: 'bg-catReuse/15 text-catReuse border-catReuse/40',       dot: 'bg-catReuse' },
-  Rot:     { border: 'border-l-catRot',     top: 'border-t-catRot',     badge: 'bg-catRot/15 text-catRot border-catRot/40',             dot: 'bg-catRot' },
-  Refuse:  { border: 'border-l-catRefuse',  top: 'border-t-catRefuse',  badge: 'bg-catRefuse/15 text-catRefuse border-catRefuse/40',    dot: 'bg-catRefuse' },
-  Reduce:  { border: 'border-l-catReduce',  top: 'border-t-catReduce',  badge: 'bg-catReduce/15 text-catReduce border-catReduce/40',    dot: 'bg-catReduce' }
+  Reuse: { border: 'border-l-catReuse', top: 'border-t-catReuse', badge: 'bg-catReuse/15 text-catReuse border-catReuse/40', dot: 'bg-catReuse' },
+  Rot: { border: 'border-l-catRot', top: 'border-t-catRot', badge: 'bg-catRot/15 text-catRot border-catRot/40', dot: 'bg-catRot' },
+  Refuse: { border: 'border-l-catRefuse', top: 'border-t-catRefuse', badge: 'bg-catRefuse/15 text-catRefuse border-catRefuse/40', dot: 'bg-catRefuse' },
+  Reduce: { border: 'border-l-catReduce', top: 'border-t-catReduce', badge: 'bg-catReduce/15 text-catReduce border-catReduce/40', dot: 'bg-catReduce' }
 };
 
 // ─────────────────────────────────────────────
 // 2. APPLICATION STATE & HISTORY SYNC
 // ─────────────────────────────────────────────
 const STORAGE_KEY = 'ecolens_web_history_v1';
-let currentCity          = 'Delhi';
-let currentMode          = 'demo'; // 'demo' | 'webcam' | 'snapshot' | 'upload'
-let bboxVisible          = true;
-let isScanning           = false;
-let scanAgainReady       = false;
-let webcamStream         = null;
-let uploadedFile         = null;
+let currentCity = 'Delhi';
+let currentMode = 'demo'; // 'demo' | 'webcam' | 'snapshot' | 'upload'
+let bboxVisible = true;
+let isScanning = false;
+let scanAgainReady = false;
+let webcamStream = null;
+let uploadedFile = null;
 let capturedSnapshotBlob = null;
-let currentResults       = [];
-let scanHistory          = [];
+let currentResults = [];
+let scanHistory = [];
 
 function saveHistoryToStorage() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(scanHistory));
-  } catch (e) {}
+  } catch (e) { }
 }
 
 function loadHistoryFromStorageFallback() {
@@ -166,7 +166,7 @@ function loadHistoryFromStorageFallback() {
       scanHistory = JSON.parse(raw);
       return;
     }
-  } catch (e) {}
+  } catch (e) { }
   scanHistory = [];
 }
 
@@ -412,10 +412,10 @@ function renderBoundingBoxes(items) {
 
   valid.forEach(item => {
     const [ymin, xmin, ymax, xmax] = item.box_2d.map(v => Math.max(0, Math.min(1000, v)));
-    const top    = (ymin / 10).toFixed(2);
-    const left   = (xmin / 10).toFixed(2);
+    const top = (ymin / 10).toFixed(2);
+    const left = (xmin / 10).toFixed(2);
     const height = Math.max(2, (ymax - ymin) / 10).toFixed(2);
-    const width  = Math.max(2, (xmax - xmin) / 10).toFixed(2);
+    const width = Math.max(2, (xmax - xmin) / 10).toFixed(2);
 
     const c = BBOX_COLORS[item.category] || BBOX_COLORS.Recycle;
     const box = document.createElement('div');
@@ -439,7 +439,7 @@ function renderBoundingBoxes(items) {
 
 function toggleBoundingBoxes() {
   bboxVisible = !bboxVisible;
-  const btn  = document.getElementById('btn-bbox-toggle');
+  const btn = document.getElementById('btn-bbox-toggle');
   const text = document.getElementById('bbox-btn-text');
 
   if (bboxVisible) {
@@ -533,7 +533,7 @@ async function persistScanToHistory(sourceLabel, showFeedbackToast = false) {
 
   const now = new Date();
   const pad = n => String(n).padStart(2, '0');
-  const ts  = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  const ts = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
   const entry = {
     id: 'scan-' + Date.now(),
@@ -552,7 +552,7 @@ async function persistScanToHistory(sourceLabel, showFeedbackToast = false) {
     if (res.ok) {
       await loadHistoryFromBackend();
     }
-  } catch {}
+  } catch { }
 
   if (showFeedbackToast) {
     showToast('Scan saved to History!');
@@ -572,8 +572,8 @@ async function runScan() {
   isScanning = true;
 
   const laser = document.getElementById('scan-laser');
-  const ov    = document.getElementById('bbox-overlay');
-  const pill  = document.getElementById('viewport-status-pill');
+  const ov = document.getElementById('bbox-overlay');
+  const pill = document.getElementById('viewport-status-pill');
 
   laser.classList.remove('hidden');
   ov.classList.add('opacity-0');
@@ -609,7 +609,8 @@ async function runScan() {
         throw new Error(`Scan request failed (${startRes.status})`);
       }
 
-      for (let i = 0; i < 180; i++) {
+      const maxPolls = 240; // 240 * 500ms = 2 minutes (use 600 for 5 minutes)
+      for (let i = 0; i < maxPolls; i++) {
         await new Promise(r => setTimeout(r, 500));
         rData = await fetch('/api/results').then(r => r.json());
         if (rData && rData.status) {
@@ -641,8 +642,8 @@ async function runScan() {
       const sourceLabel = wasWebcamScan
         ? 'Webcam Scan'
         : currentMode === 'upload'
-        ? 'Uploaded Photo'
-        : 'Demo Pile';
+          ? 'Uploaded Photo'
+          : 'Demo Pile';
       await persistScanToHistory(sourceLabel, false);
       showToast(`Classified ${currentResults.length} items & saved to History`);
     } else {
@@ -667,8 +668,8 @@ async function saveCurrentScan() {
     currentMode === 'webcam' || currentMode === 'snapshot'
       ? 'Webcam Scan'
       : currentMode === 'upload'
-      ? 'Uploaded Photo'
-      : 'Demo Pile';
+        ? 'Uploaded Photo'
+        : 'Demo Pile';
   await persistScanToHistory(sourceLabel, true);
 }
 
@@ -692,7 +693,7 @@ async function clearResults() {
 
   try {
     await fetch('/api/clear', { method: 'POST' });
-  } catch {}
+  } catch { }
 }
 
 // ─────────────────────────────────────────────
@@ -754,11 +755,11 @@ function renderResultsPanel(items, scanTime) {
 function render5RGuide() {
   const tips = CITY_TIPS[currentCity].guide;
   const cards = [
-    { cat: 'Refuse',  title: '1. Refuse',  desc: 'Eliminate hazardous or non-recyclable single-use waste at the source.', ex: 'AA Batteries, Thermocol, Single-use bags', local: tips.Refuse },
-    { cat: 'Reduce',  title: '2. Reduce',  desc: 'Minimize multi-material packaging that resists standard recycling.', ex: 'PE-lined coffee cups, Foil wraps', local: tips.Reduce },
-    { cat: 'Reuse',   title: '3. Reuse',   desc: 'Extend product lifespan by repurposing durable containers.', ex: 'Glass pickle jars, Tin cans, Cloth bags', local: tips.Reuse },
+    { cat: 'Refuse', title: '1. Refuse', desc: 'Eliminate hazardous or non-recyclable single-use waste at the source.', ex: 'AA Batteries, Thermocol, Single-use bags', local: tips.Refuse },
+    { cat: 'Reduce', title: '2. Reduce', desc: 'Minimize multi-material packaging that resists standard recycling.', ex: 'PE-lined coffee cups, Foil wraps', local: tips.Reduce },
+    { cat: 'Reuse', title: '3. Reuse', desc: 'Extend product lifespan by repurposing durable containers.', ex: 'Glass pickle jars, Tin cans, Cloth bags', local: tips.Reuse },
     { cat: 'Recycle', title: '4. Recycle', desc: 'Recover clean dry materials back into circular manufacturing.', ex: 'PET #1 bottles, Cardboard, Aluminum', local: tips.Recycle },
-    { cat: 'Rot',     title: '5. Rot',     desc: 'Return biodegradable wet organics back to nutrient-rich soil.', ex: 'Banana peels, Coffee grounds, Tea leaves', local: tips.Rot }
+    { cat: 'Rot', title: '5. Rot', desc: 'Return biodegradable wet organics back to nutrient-rich soil.', ex: 'Banana peels, Coffee grounds, Tea leaves', local: tips.Rot }
   ];
 
   const grid = document.getElementById('five-r-grid');
@@ -811,7 +812,7 @@ function changeCity(newCity) {
 function renderHistoryDashboard() {
   const totalScans = scanHistory.length;
   let totalItems = 0;
-  let totalCo2   = 0;
+  let totalCo2 = 0;
 
   scanHistory.forEach(entry => {
     (entry.results || []).forEach(it => {
@@ -822,7 +823,7 @@ function renderHistoryDashboard() {
 
   document.getElementById('kpi-total-scans').textContent = totalScans;
   document.getElementById('kpi-total-items').textContent = totalItems;
-  document.getElementById('kpi-total-co2').textContent   = totalCo2.toFixed(2);
+  document.getElementById('kpi-total-co2').textContent = totalCo2.toFixed(2);
 
   const list = document.getElementById('history-list');
   if (totalScans === 0) {
@@ -910,7 +911,7 @@ async function confirmClearHistory() {
   renderHistoryDashboard();
   try {
     await fetch('/api/history', { method: 'DELETE' });
-  } catch {}
+  } catch { }
   showToast('All scan history cleared');
 }
 
