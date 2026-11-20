@@ -2,6 +2,7 @@
 Gemini 2.5 Flash Vision Engine with Structured JSON Output.
 Guarantees valid JSON responses without fragile markdown string stripping.
 """
+
 import json
 from importlib import import_module
 from typing import Literal
@@ -31,9 +32,14 @@ class EcoLensAI:
             raise ValueError(
                 "GEMINI_API_KEY is missing! Add it to your .env file in the project root."
             )
-        self.client = genai.Client(api_key=API_KEY)
+        self.client = genai.Client(
+            api_key=API_KEY,
+            http_options=types.HttpOptions(api_version="v1beta"),
+        )
 
-    def analyze_image_bytes(self, image_bytes: bytes, city: str = "Delhi") -> list[dict]:
+    def analyze_image_bytes(
+        self, image_bytes: bytes, city: str = "Delhi"
+    ) -> list[dict]:
         """Sends JPEG bytes to Gemini 2.5 Flash and returns a validated list of waste items."""
         prompt = f"""
         You are EcoLens, an expert waste management AI.
@@ -57,6 +63,7 @@ class EcoLensAI:
                 response_mime_type="application/json",
                 response_schema=list[WasteItem],
                 temperature=0.2,
+                thinking_config=types.ThinkingConfig(thinking_level="low"),
             ),
         )
 

@@ -22,7 +22,7 @@ SCANS_DIR.mkdir(exist_ok=True)
 # Gemini & App Settings
 API_KEY = os.getenv("GEMINI_API_KEY", "")
 DEFAULT_CITY = os.getenv("DEFAULT_CITY", "Delhi")
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-4-hydrogen"
 
 # Strict voice command mapping
 VOICE_COMMANDS = {
