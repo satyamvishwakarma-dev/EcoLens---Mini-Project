@@ -1,14 +1,23 @@
 [project]
 name = "ecolens-mini-project"
 version = "0.1.0"
-description = "Add your description here"
+description = "EcoLens - AI Waste Classifier & 5R Circular Assistant"
 readme = "README.md"
+requires-python = ">=3.11"
 authors = [
     { name = "Satyam Vishwakarma", email = "officialsatyamvishwakarma06@gmail.com" }
 ]
-requires-python = ">=3.12"
 dependencies = [
+    "flask>=3.1.3",
+    "google-genai>=3.6.1",
+    "opencv-python>=5.1.0.95",
+    "pillow>=13.0.0",
+    "pyaudio>=0.2.14",
+    "pydantic>=2.14.4",
+    "python-dotenv>=1.2.4",
+    "speechrecognition>=3.17.0",
     "streamlit>=1.67.0",
+    
 ]
 
 [project.scripts]
