@@ -139,11 +139,13 @@ def trigger_scan(image_bytes: bytes | None = None, city: str | None = None):
         app_state["status"] = "Analyzing with Gemini 2.5 Flash..."
         app_state["last_image_bytes"] = image_bytes
         target_city = city or app_state["city"]
+        print(f"  [SCAN] Starting Gemini analysis (city={target_city}, bytes={len(image_bytes)})")
 
     def _worker():
         speak("Scanning now.")
         try:
             results = ai_engine.analyze_image_bytes(image_bytes, city=target_city)
+            print(f"  [SCAN] Gemini returned {len(results)} item(s)")
             now = datetime.datetime.now().strftime("%H:%M:%S")
             with state_lock:
                 app_state["results"] = results

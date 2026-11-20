@@ -1,0 +1,31 @@
+[
+  {
+    "timestamp": "20261120_181628",
+    "city": "Delhi",
+    "image": "scan_20261120_181628.jpg",
+    "results": [
+      {
+        "item": "wireless earbuds charging case",
+        "category": "Recycle",
+        "box_2d": [
+          291,
+          218,
+          891,
+          606
+        ],
+        "reason": "Electronic accessory containing a lithium-ion battery and circuit boards that should not go to landfill.",
+        "reuse_ideas": [
+          "Use as a small storage box for tiny trinkets if still functional",
+          "Store spare micro-screws or earrings",
+          "Keep as a travel container for pills"
+        ],
+        "where_to_dispose": [
+          "E-waste collection center",
+          "Authorized electronics recycler",
+          "Municipal e-waste bin"
+        ],
+        "local_tip": "In Delhi, hand this over to an authorized e-waste recycler or schedule a pickup via authorized local waste collectors."
+      }
+    ]
+  }
+]

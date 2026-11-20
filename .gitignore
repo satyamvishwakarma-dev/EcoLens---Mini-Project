@@ -9,3 +9,6 @@ wheels/
 # Virtual environments & secrets
 .venv/
 .env
+
+
+saved_scans/

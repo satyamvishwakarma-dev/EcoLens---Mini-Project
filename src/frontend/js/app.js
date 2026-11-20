@@ -64,6 +64,14 @@ const CO2_BY_CATEGORY = {
   Reduce:  0.09
 };
 
+const BBOX_COLORS = {
+  Recycle: { border: '#00BCD4', bg: 'rgba(0,188,212,0.14)' },
+  Reuse:   { border: '#4CAF50', bg: 'rgba(76,175,80,0.14)'  },
+  Rot:     { border: '#8BC34A', bg: 'rgba(139,195,74,0.14)' },
+  Refuse:  { border: '#F44336', bg: 'rgba(244,67,54,0.14)'  },
+  Reduce:  { border: '#FF9800', bg: 'rgba(255,152,0,0.14)'  },
+};
+
 function getDemoItemsForCity(city) {
   const tips = CITY_TIPS[city] || CITY_TIPS["Delhi"];
   return [
@@ -71,6 +79,7 @@ function getDemoItemsForCity(city) {
       item: "PET Plastic Water Bottle (500ml)",
       category: "Recycle",
       co2: 0.18,
+      box_2d: [233, 110, 756, 205],
       reason: "Clear #1 PET thermoplastic with high material recovery and recycling demand.",
       reuse_ideas: [
         "Cut bottom half into a self-watering desk herb planter",
@@ -83,6 +92,7 @@ function getDemoItemsForCity(city) {
       item: "PE-Lined Disposable Coffee Cup",
       category: "Reduce",
       co2: 0.09,
+      box_2d: [369, 325, 789, 460],
       reason: "Paperboard bonded with thin polyethylene (PE) moisture film complicates standard pulping.",
       reuse_ideas: [
         "Use as a seedling starter pot before soil transplanting",
@@ -95,6 +105,7 @@ function getDemoItemsForCity(city) {
       item: "Banana Peel (Organic Scrap)",
       category: "Rot",
       co2: 0.14,
+      box_2d: [533, 548, 789, 718],
       reason: "Potassium- and nitrogen-rich biodegradable wet waste ideal for rapid aerobic composting.",
       reuse_ideas: [
         "Soak in water for 48 hours to create potassium-rich liquid plant fertilizer",
@@ -107,6 +118,7 @@ function getDemoItemsForCity(city) {
       item: "AA Alkaline Battery (1.5V)",
       category: "Refuse",
       co2: 0.42,
+      box_2d: [515, 790, 767, 868],
       reason: "Contains heavy metals that leach toxic compounds into groundwater if landfilled.",
       reuse_ideas: [
         "Switch to NiMH rechargeable AA cells to replace hundreds of disposables",
@@ -134,6 +146,7 @@ let currentCity          = 'Delhi';
 let currentMode          = 'demo'; // 'demo' | 'webcam' | 'snapshot' | 'upload'
 let bboxVisible          = true;
 let isScanning           = false;
+let scanAgainReady       = false;
 let webcamStream         = null;
 let uploadedFile         = null;
 let capturedSnapshotBlob = null;
@@ -287,6 +300,18 @@ function setupDragAndDrop() {
 // ─────────────────────────────────────────────
 // 4. VIEWPORT MODES (WEBCAM, UPLOAD, DEMO PILE)
 // ─────────────────────────────────────────────
+function setScanButtonState(label, isScanAgain = false) {
+  scanAgainReady = isScanAgain;
+  const btn = document.getElementById('btn-scan-main');
+  if (!btn) return;
+  const textNodes = Array.from(btn.childNodes).filter(n => n.nodeType === Node.TEXT_NODE);
+  if (textNodes.length) {
+    textNodes[textNodes.length - 1].textContent = ` ${label}`;
+  } else {
+    btn.append(` ${label}`);
+  }
+}
+
 async function startWebcam() {
   const videoEl = document.getElementById('webcam-video');
   const labelEl = document.getElementById('webcam-btn-label');
@@ -312,7 +337,8 @@ async function startWebcam() {
     currentMode = 'webcam';
     uploadedFile = null;
     capturedSnapshotBlob = null;
-    labelEl.textContent = 'Stop Webcam';
+    setScanButtonState('Scan Waste', false);
+    if (labelEl) labelEl.textContent = 'Stop Webcam';
     document.getElementById('viewport-mode-badge').textContent = 'LIVE WEBCAM • 16:9';
     showToast('Webcam connected — click Scan Waste to freeze & scan');
   } catch (err) {
@@ -326,7 +352,8 @@ function stopWebcam() {
     webcamStream = null;
   }
   document.getElementById('webcam-video').classList.add('hidden');
-  document.getElementById('webcam-btn-label').textContent = 'Start Webcam';
+  const labelEl = document.getElementById('webcam-btn-label');
+  if (labelEl) labelEl.textContent = 'Start Webcam';
 }
 
 function handleImageUpload(event) {
@@ -338,6 +365,7 @@ function displayUploadedFile(file) {
   stopWebcam();
   uploadedFile = file;
   capturedSnapshotBlob = null;
+  setScanButtonState('Scan Waste', false);
   const snapCanvas = document.getElementById('snapshot-canvas');
   if (snapCanvas) snapCanvas.classList.add('hidden');
 
@@ -358,6 +386,7 @@ function loadDemoPile() {
   stopWebcam();
   uploadedFile = null;
   capturedSnapshotBlob = null;
+  setScanButtonState('Scan Waste', false);
   const snapCanvas = document.getElementById('snapshot-canvas');
   if (snapCanvas) snapCanvas.classList.add('hidden');
   document.getElementById('uploaded-preview').classList.add('hidden');
@@ -367,23 +396,63 @@ function loadDemoPile() {
   showToast('Demo Waste Pile loaded');
 }
 
+function renderBoundingBoxes(items) {
+  const ov = document.getElementById('bbox-overlay');
+  if (!ov) return;
+  ov.innerHTML = '';
+
+  const valid = (items || []).filter(
+    it => Array.isArray(it.box_2d) && it.box_2d.length === 4
+  );
+
+  if (!valid.length || !bboxVisible) {
+    ov.classList.add('opacity-0');
+    return;
+  }
+
+  valid.forEach(item => {
+    const [ymin, xmin, ymax, xmax] = item.box_2d.map(v => Math.max(0, Math.min(1000, v)));
+    const top    = (ymin / 10).toFixed(2);
+    const left   = (xmin / 10).toFixed(2);
+    const height = Math.max(2, (ymax - ymin) / 10).toFixed(2);
+    const width  = Math.max(2, (xmax - xmin) / 10).toFixed(2);
+
+    const c = BBOX_COLORS[item.category] || BBOX_COLORS.Recycle;
+    const box = document.createElement('div');
+    box.title = `${item.item} (${item.category})`;
+    box.style.cssText = `
+      position: absolute;
+      top: ${top}%;
+      left: ${left}%;
+      width: ${width}%;
+      height: ${height}%;
+      border: 2px solid ${c.border};
+      background: ${c.bg};
+      border-radius: 8px;
+    `;
+
+    ov.appendChild(box);
+  });
+
+  ov.classList.remove('opacity-0');
+}
+
 function toggleBoundingBoxes() {
   bboxVisible = !bboxVisible;
   const btn  = document.getElementById('btn-bbox-toggle');
   const text = document.getElementById('bbox-btn-text');
-  const ov   = document.getElementById('bbox-overlay');
 
   if (bboxVisible) {
     text.textContent = 'BBox: ON';
     btn.classList.add('border-emeraldAccent/40', 'text-emeraldAccent');
     btn.classList.remove('border-borderSubtle', 'text-gray-400');
-    if (currentResults.length > 0 && currentMode === 'demo') ov.classList.remove('opacity-0');
   } else {
     text.textContent = 'BBox: OFF';
     btn.classList.remove('border-emeraldAccent/40', 'text-emeraldAccent');
     btn.classList.add('border-borderSubtle', 'text-gray-400');
-    ov.classList.add('opacity-0');
   }
+
+  renderBoundingBoxes(currentResults);
 }
 
 // ─────────────────────────────────────────────
@@ -456,97 +525,15 @@ function freezeWebcamAndGetBlob() {
   });
 }
 
-async function runScan() {
-  if (isScanning) return;
-  isScanning = true;
-
-  const laser = document.getElementById('scan-laser');
-  const ov    = document.getElementById('bbox-overlay');
-  const pill  = document.getElementById('viewport-status-pill');
-
-  laser.classList.remove('hidden');
-  ov.classList.add('opacity-0');
-  pill.textContent = 'Analyzing with Gemini...';
-  pill.classList.add('text-emeraldAccent');
-
-  try {
-    if (currentMode === 'demo') {
-      await new Promise(r => setTimeout(r, 900));
-      currentResults = getDemoItemsForCity(currentCity);
-      if (bboxVisible) ov.classList.remove('opacity-0');
-    } else {
-      const fd = new FormData();
-      fd.append('city', currentCity);
-
-      if (currentMode === 'webcam') {
-        const blob = await freezeWebcamAndGetBlob();
-        fd.append('image', blob, 'webcam_frame.jpg');
-      } else if (currentMode === 'snapshot' && capturedSnapshotBlob) {
-        fd.append('image', capturedSnapshotBlob, 'webcam_frame.jpg');
-      } else if (currentMode === 'upload' && uploadedFile) {
-        fd.append('image', uploadedFile);
-      } else {
-        throw new Error('Select an image or start the webcam first');
-      }
-
-      const startRes = await fetch('/api/scan', { method: 'POST', body: fd });
-      if (!startRes.ok) {
-        throw new Error(`Scan request failed (${startRes.status})`);
-      }
-
-      let rData = null;
-      for (let i = 0; i < 40; i++) {
-        await new Promise(r => setTimeout(r, 500));
-        rData = await fetch('/api/results').then(r => r.json());
-        if (!rData.is_scanning) break;
-      }
-
-      if (!rData || rData.is_scanning) {
-        throw new Error('Gemini analysis timed out');
-      }
-      if (rData.status && rData.status.startsWith('Scan error')) {
-        throw new Error(rData.status);
-      }
-
-      currentResults = (rData.results || []).map(item => ({
-        ...item,
-        co2: item.co2 ?? CO2_BY_CATEGORY[item.category] ?? 0.15
-      }));
-    }
-
-    const nowTime = new Date().toTimeString().split(' ')[0];
-    pill.textContent = `Scanned at ${nowTime} • ${currentResults.length} items`;
-    renderResultsPanel(currentResults, nowTime);
-    showToast(
-      currentResults.length
-        ? `Classified ${currentResults.length} waste items`
-        : 'No waste items detected'
-    );
-  } catch (err) {
-    console.error(err);
-    pill.textContent = 'Scan failed';
-    showToast(err.message || 'Scan failed — check backend logs');
-  } finally {
-    laser.classList.add('hidden');
-    isScanning = false;
-  }
-}
-
-async function saveCurrentScan() {
+async function persistScanToHistory(sourceLabel, showFeedbackToast = false) {
   if (!currentResults.length) {
-    showToast('Run "Scan Waste" first before saving');
-    return;
+    if (showFeedbackToast) showToast('Run "Scan Waste" first before saving');
+    return false;
   }
 
   const now = new Date();
   const pad = n => String(n).padStart(2, '0');
   const ts  = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-  const sourceLabel =
-    currentMode === 'webcam' || currentMode === 'snapshot'
-      ? 'Webcam Scan'
-      : currentMode === 'upload'
-      ? 'Uploaded Photo'
-      : 'Demo Pile';
 
   const entry = {
     id: 'scan-' + Date.now(),
@@ -567,12 +554,128 @@ async function saveCurrentScan() {
     }
   } catch {}
 
-  showToast('Scan saved to History!');
+  if (showFeedbackToast) {
+    showToast('Scan saved to History!');
+  }
+  return true;
+}
+
+async function runScan() {
+  if (isScanning) return;
+
+  // Clicking "Scan Again" re-opens the live webcam directly
+  if (scanAgainReady) {
+    await startWebcam();
+    return;
+  }
+
+  isScanning = true;
+
+  const laser = document.getElementById('scan-laser');
+  const ov    = document.getElementById('bbox-overlay');
+  const pill  = document.getElementById('viewport-status-pill');
+
+  laser.classList.remove('hidden');
+  ov.classList.add('opacity-0');
+  pill.textContent = 'Analyzing with Gemini...';
+  pill.classList.add('text-emeraldAccent');
+
+  let wasWebcamScan = false;
+  let rData = null;
+
+  try {
+    if (currentMode === 'demo') {
+      await new Promise(r => setTimeout(r, 900));
+      currentResults = getDemoItemsForCity(currentCity);
+    } else {
+      const fd = new FormData();
+      fd.append('city', currentCity);
+
+      if (currentMode === 'webcam') {
+        wasWebcamScan = true;
+        const blob = await freezeWebcamAndGetBlob();
+        fd.append('image', blob, 'webcam_frame.jpg');
+      } else if (currentMode === 'snapshot' && capturedSnapshotBlob) {
+        wasWebcamScan = true;
+        fd.append('image', capturedSnapshotBlob, 'webcam_frame.jpg');
+      } else if (currentMode === 'upload' && uploadedFile) {
+        fd.append('image', uploadedFile);
+      } else {
+        throw new Error('Select an image or start the webcam first');
+      }
+
+      const startRes = await fetch('/api/scan', { method: 'POST', body: fd });
+      if (!startRes.ok) {
+        throw new Error(`Scan request failed (${startRes.status})`);
+      }
+
+      for (let i = 0; i < 180; i++) {
+        await new Promise(r => setTimeout(r, 500));
+        rData = await fetch('/api/results').then(r => r.json());
+        if (rData && rData.status) {
+          pill.textContent = rData.status;
+        }
+        if (rData && !rData.is_scanning) break;
+      }
+
+      if (!rData || rData.is_scanning) {
+        throw new Error('Gemini analysis timed out');
+      }
+      if (rData.status && rData.status.startsWith('Scan error')) {
+        throw new Error(rData.status);
+      }
+
+      currentResults = (rData.results || []).map(item => ({
+        ...item,
+        co2: item.co2 ?? CO2_BY_CATEGORY[item.category] ?? 0.15
+      }));
+    }
+
+    renderBoundingBoxes(currentResults);
+
+    const nowTime = new Date().toTimeString().split(' ')[0];
+    pill.textContent = `Scanned at ${nowTime} • ${currentResults.length} items`;
+    renderResultsPanel(currentResults, nowTime);
+
+    if (currentResults.length > 0) {
+      const sourceLabel = wasWebcamScan
+        ? 'Webcam Scan'
+        : currentMode === 'upload'
+        ? 'Uploaded Photo'
+        : 'Demo Pile';
+      await persistScanToHistory(sourceLabel, false);
+      showToast(`Classified ${currentResults.length} items & saved to History`);
+    } else {
+      showToast('No waste items detected');
+    }
+
+    if (wasWebcamScan) {
+      setScanButtonState('Scan Again', true);
+    }
+  } catch (err) {
+    console.error(err);
+    pill.textContent = 'Scan failed';
+    showToast(err.message || 'Scan failed — check backend logs');
+  } finally {
+    laser.classList.add('hidden');
+    isScanning = false;
+  }
+}
+
+async function saveCurrentScan() {
+  const sourceLabel =
+    currentMode === 'webcam' || currentMode === 'snapshot'
+      ? 'Webcam Scan'
+      : currentMode === 'upload'
+      ? 'Uploaded Photo'
+      : 'Demo Pile';
+  await persistScanToHistory(sourceLabel, true);
 }
 
 async function clearResults() {
   currentResults = [];
   capturedSnapshotBlob = null;
+  setScanButtonState('Scan Waste', false);
   const snapCanvas = document.getElementById('snapshot-canvas');
   if (snapCanvas) snapCanvas.classList.add('hidden');
   document.getElementById('bbox-overlay').classList.add('opacity-0');
@@ -726,7 +829,7 @@ function renderHistoryDashboard() {
     list.innerHTML = `
       <div class="rounded-2xl bg-card border border-borderSubtle p-10 text-center">
         <p class="text-sm font-semibold text-gray-300">No Saved Scans Yet</p>
-        <p class="text-xs text-gray-500 mt-1">Run a scan in the Live Scanner above and click <strong class="text-blue-400">Save to History</strong>.</p>
+        <p class="text-xs text-gray-500 mt-1">Run a scan in the Live Scanner above — results are saved to History automatically.</p>
       </div>
     `;
     return;
