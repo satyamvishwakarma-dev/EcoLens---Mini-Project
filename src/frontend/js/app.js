@@ -130,14 +130,15 @@ const CAT_STYLES = {
 // 2. APPLICATION STATE & HISTORY SYNC
 // ─────────────────────────────────────────────
 const STORAGE_KEY = 'ecolens_web_history_v1';
-let currentCity    = 'Delhi';
-let currentMode    = 'demo'; // 'demo' | 'webcam' | 'upload'
-let bboxVisible    = true;
-let isScanning     = false;
-let webcamStream   = null;
-let uploadedFile   = null;
-let currentResults = [];
-let scanHistory    = [];
+let currentCity          = 'Delhi';
+let currentMode          = 'demo'; // 'demo' | 'webcam' | 'snapshot' | 'upload'
+let bboxVisible          = true;
+let isScanning           = false;
+let webcamStream         = null;
+let uploadedFile         = null;
+let capturedSnapshotBlob = null;
+let currentResults       = [];
+let scanHistory          = [];
 
 function saveHistoryToStorage() {
   try {
@@ -289,6 +290,7 @@ function setupDragAndDrop() {
 async function startWebcam() {
   const videoEl = document.getElementById('webcam-video');
   const labelEl = document.getElementById('webcam-btn-label');
+  const snapCanvas = document.getElementById('snapshot-canvas');
 
   if (webcamStream) {
     stopWebcam();
@@ -303,14 +305,16 @@ async function startWebcam() {
     });
     videoEl.srcObject = webcamStream;
     videoEl.classList.remove('hidden');
+    if (snapCanvas) snapCanvas.classList.add('hidden');
     document.getElementById('demo-pile-scene').classList.add('hidden');
     document.getElementById('uploaded-preview').classList.add('hidden');
 
     currentMode = 'webcam';
     uploadedFile = null;
+    capturedSnapshotBlob = null;
     labelEl.textContent = 'Stop Webcam';
     document.getElementById('viewport-mode-badge').textContent = 'LIVE WEBCAM • 16:9';
-    showToast('Webcam connected — click Scan Waste');
+    showToast('Webcam connected — click Scan Waste to freeze & scan');
   } catch (err) {
     showToast('Webcam unavailable or permission denied — using Demo Pile');
   }
@@ -333,6 +337,10 @@ function handleImageUpload(event) {
 function displayUploadedFile(file) {
   stopWebcam();
   uploadedFile = file;
+  capturedSnapshotBlob = null;
+  const snapCanvas = document.getElementById('snapshot-canvas');
+  if (snapCanvas) snapCanvas.classList.add('hidden');
+
   const reader = new FileReader();
   reader.onload = (e) => {
     const img = document.getElementById('uploaded-preview');
@@ -349,6 +357,9 @@ function displayUploadedFile(file) {
 function loadDemoPile() {
   stopWebcam();
   uploadedFile = null;
+  capturedSnapshotBlob = null;
+  const snapCanvas = document.getElementById('snapshot-canvas');
+  if (snapCanvas) snapCanvas.classList.add('hidden');
   document.getElementById('uploaded-preview').classList.add('hidden');
   document.getElementById('demo-pile-scene').classList.remove('hidden');
   currentMode = 'demo';
@@ -402,20 +413,45 @@ function simulateVoice(phrase) {
   }
 }
 
-function captureWebcamBlob() {
+function freezeWebcamAndGetBlob() {
   return new Promise((resolve, reject) => {
     const video = document.getElementById('webcam-video');
+    const canvas = document.getElementById('snapshot-canvas');
     if (!video || !video.videoWidth || !video.videoHeight) {
       return reject(new Error('Webcam frame not ready yet'));
     }
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error('Failed to capture webcam frame'));
+    if (canvas) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.classList.remove('hidden');
+      stopWebcam();
+      currentMode = 'snapshot';
+      document.getElementById('viewport-mode-badge').textContent = 'CAPTURED FRAME';
+      canvas.toBlob((blob) => {
+        if (blob) {
+          capturedSnapshotBlob = blob;
+          resolve(blob);
+        } else {
+          reject(new Error('Failed to capture webcam frame'));
+        }
+      }, 'image/jpeg', 0.92);
+      return;
+    }
+
+    const fallbackCanvas = document.createElement('canvas');
+    fallbackCanvas.width = video.videoWidth;
+    fallbackCanvas.height = video.videoHeight;
+    fallbackCanvas.getContext('2d').drawImage(video, 0, 0, fallbackCanvas.width, fallbackCanvas.height);
+    stopWebcam();
+    fallbackCanvas.toBlob((blob) => {
+      if (blob) {
+        capturedSnapshotBlob = blob;
+        resolve(blob);
+      } else {
+        reject(new Error('Failed to capture webcam frame'));
+      }
     }, 'image/jpeg', 0.9);
   });
 }
@@ -430,7 +466,7 @@ async function runScan() {
 
   laser.classList.remove('hidden');
   ov.classList.add('opacity-0');
-  pill.textContent = 'Analyzing with Gemini 2.5 Flash...';
+  pill.textContent = 'Analyzing with Gemini...';
   pill.classList.add('text-emeraldAccent');
 
   try {
@@ -443,8 +479,10 @@ async function runScan() {
       fd.append('city', currentCity);
 
       if (currentMode === 'webcam') {
-        const blob = await captureWebcamBlob();
+        const blob = await freezeWebcamAndGetBlob();
         fd.append('image', blob, 'webcam_frame.jpg');
+      } else if (currentMode === 'snapshot' && capturedSnapshotBlob) {
+        fd.append('image', capturedSnapshotBlob, 'webcam_frame.jpg');
       } else if (currentMode === 'upload' && uploadedFile) {
         fd.append('image', uploadedFile);
       } else {
@@ -503,7 +541,12 @@ async function saveCurrentScan() {
   const now = new Date();
   const pad = n => String(n).padStart(2, '0');
   const ts  = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-  const sourceLabel = currentMode === 'webcam' ? 'Webcam Scan' : currentMode === 'upload' ? 'Uploaded Photo' : 'Demo Pile';
+  const sourceLabel =
+    currentMode === 'webcam' || currentMode === 'snapshot'
+      ? 'Webcam Scan'
+      : currentMode === 'upload'
+      ? 'Uploaded Photo'
+      : 'Demo Pile';
 
   const entry = {
     id: 'scan-' + Date.now(),
@@ -529,6 +572,9 @@ async function saveCurrentScan() {
 
 async function clearResults() {
   currentResults = [];
+  capturedSnapshotBlob = null;
+  const snapCanvas = document.getElementById('snapshot-canvas');
+  if (snapCanvas) snapCanvas.classList.add('hidden');
   document.getElementById('bbox-overlay').classList.add('opacity-0');
   document.getElementById('viewport-status-pill').textContent = 'Ready to Scan';
   document.getElementById('results-count-badge').textContent = '0 items';
