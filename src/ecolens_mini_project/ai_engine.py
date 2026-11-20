@@ -3,10 +3,14 @@ Gemini 2.5 Flash Vision Engine with Structured JSON Output.
 Guarantees valid JSON responses without fragile markdown string stripping.
 """
 import json
+from importlib import import_module
 from typing import Literal
 from pydantic import BaseModel
-from google import genai
-from google.genai import types
+
+# Load the optional Google GenAI namespace dynamically so static analyzers do
+# not report a false unresolved-import error for the namespace package.
+genai = import_module("google.genai")
+types = import_module("google.genai.types")
 
 from ecolens_mini_project.config import API_KEY, MODEL_NAME
 

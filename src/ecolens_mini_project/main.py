@@ -227,7 +227,10 @@ def voice_listener():
                     if is_speaking.is_set():
                         continue
 
-                    text = recognizer.recognize_google(audio).lower().strip()
+                    # The installed speech_recognition type stubs may not expose
+                    # backend methods that are available on the runtime object.
+                    recognize_google = getattr(recognizer, "recognize_google")
+                    text = recognize_google(audio).lower().strip()
                     first_word = text.split()[0].rstrip(".,!?") if text.split() else ""
 
                     if first_word in VOICE_COMMANDS:

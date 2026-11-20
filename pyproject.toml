@@ -20,7 +20,7 @@ dependencies = [
 ]
 
 [project.scripts]
-ecolens-mini-project = "ecolens_mini_project:main"
+ecolens = "ecolens_mini_project.main:run"
 
 [build-system]
 requires = ["uv_build>=0.12.4,<0.13.0"]
