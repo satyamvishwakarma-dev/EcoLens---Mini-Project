@@ -25,3 +25,7 @@ ecolens = "ecolens_mini_project.main:run"
 [build-system]
 requires = ["uv_build>=0.12.4,<0.13.0"]
 build-backend = "uv_build"
+
+
+[tool.vercel]
+entrypoint = "ecolens_mini_project.main:app"
