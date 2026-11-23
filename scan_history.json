@@ -1,117 +1,30 @@
 [
   {
-    "timestamp": "20261120_181628",
+    "timestamp": "20261123_122107",
     "city": "Delhi",
-    "image": "scan_20261120_181628.jpg",
+    "image": "scan_20261123_122107.jpg",
     "results": [
       {
-        "item": "wireless earbuds charging case",
+        "item": "plastic pen",
         "category": "Recycle",
         "box_2d": [
-          291,
-          218,
-          891,
-          606
+          441,
+          191,
+          666,
+          765
         ],
-        "reason": "Electronic accessory containing a lithium-ion battery and circuit boards that should not go to landfill.",
+        "reason": "Made of rigid plastic casing, though dismantling the ink reservoir and spring is needed before recycling.",
         "reuse_ideas": [
-          "Use as a small storage box for tiny trinkets if still functional",
-          "Store spare micro-screws or earrings",
-          "Keep as a travel container for pills"
+          "Refill the ink cartridge instead of discarding",
+          "Use the plastic barrel as a plant stake or marker",
+          "Cut down into small rings for craft projects"
         ],
         "where_to_dispose": [
-          "E-waste collection center",
-          "Authorized electronics recycler",
-          "Municipal e-waste bin"
+          "Dry waste bin",
+          "Local kabadiwala",
+          "E-waste or hard plastic collection drive"
         ],
-        "local_tip": "In Delhi, hand this over to an authorized e-waste recycler or schedule a pickup via authorized local waste collectors."
-      }
-    ]
-  },
-  {
-    "timestamp": "20261120_201738",
-    "city": "Delhi",
-    "image": "scan_20261120_201738.jpg",
-    "results": [
-      {
-        "item": "wireless earbuds charging case",
-        "category": "Recycle",
-        "box_2d": [
-          254,
-          314,
-          808,
-          675
-        ],
-        "reason": "Electronic device housing containing internal lithium-ion batteries and circuit boards that are e-waste.",
-        "reuse_ideas": [
-          "Use as a small storage box for tiny items like pins or beads",
-          "Convert into a miniature trinket case",
-          "Use for storing small craft supplies"
-        ],
-        "where_to_dispose": [
-          "E-waste collection center",
-          "Authorized electronics recycler",
-          "Municipal e-waste drop-off bin"
-        ],
-        "local_tip": "In Delhi, hand over electronic waste like old earbuds and cases to authorized e-waste recyclers or kabadiwals registered with DPCC."
-      }
-    ]
-  },
-  {
-    "timestamp": "20261120_203937",
-    "city": "Delhi",
-    "image": "scan_20261120_203937.jpg",
-    "results": [
-      {
-        "item": "wireless earbuds case",
-        "category": "Recycle",
-        "box_2d": [
-          203,
-          102,
-          808,
-          497
-        ],
-        "reason": "Electronic device housing contains recyclable plastics and a small internal lithium battery which is hazardous if landfilled.",
-        "reuse_ideas": [
-          "store small sewing pins or needles",
-          "use as a mini travel pillbox",
-          "store small crafting beads"
-        ],
-        "where_to_dispose": [
-          "e-waste collection center",
-          "authorized electronics recycler",
-          "municipal e-waste bin"
-        ],
-        "local_tip": "In Delhi, hand this over to a certified e-waste collector like Karo Sambhav or use the Delhi government designated e-waste drop-off points."
-      }
-    ]
-  },
-  {
-    "timestamp": "20261120_204006",
-    "city": "Delhi",
-    "image": "scan_20261120_204006.jpg",
-    "results": [
-      {
-        "item": "wrist watch",
-        "category": "Reuse",
-        "box_2d": [
-          232,
-          149,
-          671,
-          590
-        ],
-        "reason": "The watch is a durable item containing metal and electronics that should be reused or repaired rather than thrown away.",
-        "reuse_ideas": [
-          "Repair the watch with a new battery or strap",
-          "Donate the watch to a local charity or secondhand shop",
-          "Upcycle parts into art or jewelry projects"
-        ],
-        "where_to_dispose": [
-          "Watch repair shop",
-          "Electronics recycling center",
-          "Local charity donation bin"
-        ],
-        "local_tip": "In Delhi, take old electronics and watches to authorized e-waste collection centers or hand them over to certified local kabadiwalas for proper recycling."
+        "local_tip": "Separate the ink refill from the plastic body and hand it over to your local MCD waste collector in the dry waste stream."
       }
     ]
   }
