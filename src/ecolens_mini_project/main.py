@@ -136,7 +136,7 @@ def trigger_scan(image_bytes: bytes | None = None, city: str | None = None):
             return
 
         app_state["is_scanning"] = True
-        app_state["status"] = "Analyzing with Gemini 2.5 Flash..."
+        app_state["status"] = "Analyzing with Gemini Flash..."
         app_state["last_image_bytes"] = image_bytes
         target_city = city or app_state["city"]
         print(f"  [SCAN] Starting Gemini analysis (city={target_city}, bytes={len(image_bytes)})")
