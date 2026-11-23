@@ -28,4 +28,4 @@ build-backend = "uv_build"
 
 
 [tool.vercel]
-entrypoint = "ecolens_mini_project.main:app"
+entrypoint = "src.ecolens_mini_project.main:app"
