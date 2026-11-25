@@ -248,16 +248,6 @@ EcoLens-Mini-Project/
 
 ---
 
-## 🎨 Screenshots
-
-*(Add screenshots of the UI here if desired)*
-
-![EcoLens Scanner](https://via.placeholder.com/800x450/0b0f12/00bc76?text=EcoLens+Scanner+UI)
-![EcoLens 5R Guide](https://via.placeholder.com/800x450/0b0f12/00bc76?text=5R+Framework+Guide)
-![EcoLens History](https://via.placeholder.com/800x450/0b0f12/00bc76?text=Scan+History)
-
----
-
 ## 📜 License
 
 This project is licensed under the **MIT License**.
