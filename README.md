@@ -250,8 +250,7 @@ EcoLens-Mini-Project/
 ## 🙋‍♂️ Support
 
 - **Issues**: Report bugs or request features via the GitHub Issues tab
-- **Contributing**: Pull requests are welcome! Please read the contributing guidelines first
-- **Contact**: satyam.vishwakarma@example.com (replace with actual contact)
+- **Contributing**: Pull requests are welcome!
 
 ---
 
