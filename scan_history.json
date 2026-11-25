@@ -27,5 +27,150 @@
         "local_tip": "Separate the ink refill from the plastic body and hand it over to your local MCD waste collector in the dry waste stream."
       }
     ]
+  },
+  {
+    "timestamp": "20261123_150711",
+    "city": "Delhi",
+    "image": "scan_20261123_150711.jpg",
+    "results": [
+      {
+        "item": "smartphone",
+        "category": "Recycle",
+        "box_2d": [
+          456,
+          260,
+          951,
+          759
+        ],
+        "reason": "Electronic devices contain valuable metals and hazardous components that should be recycled through certified e-waste facilities.",
+        "reuse_ideas": [
+          "Use as a dedicated security camera with a surveillance app",
+          "Convert into a permanent digital photo frame",
+          "Use as a dedicated offline music player or e-reader"
+        ],
+        "where_to_dispose": [
+          "Authorized e-waste collection center",
+          "Municipal electronic recycling drop-off bin",
+          "Manufacturer trade-in program"
+        ],
+        "local_tip": "In Delhi, contact authorized e-waste recyclers like Karo Sambhav or use municipal collection drives for safe electronic disposal."
+      }
+    ]
+  },
+  {
+    "timestamp": "20261123_150757",
+    "city": "Delhi",
+    "image": "scan_20261123_150757.jpg",
+    "results": [
+      {
+        "item": "Crumpled paper tissue",
+        "category": "Rot",
+        "box_2d": [
+          358,
+          480,
+          597,
+          661
+        ],
+        "reason": "Used paper tissues have short fibers and are often contaminated, making them unrecyclable, but they are biodegradable and suitable for composting.",
+        "reuse_ideas": [
+          "Shred and add as brown carbon material to a home compost bin",
+          "Use to wipe off excess grease from pans before washing to save water",
+          "Use as a dry fire starter for outdoor bonfires or grills"
+        ],
+        "where_to_dispose": [
+          "Green organic/wet waste bin",
+          "Home compost pit or vermicompost bin",
+          "General waste bin (if contaminated with chemicals or sanitary waste)"
+        ],
+        "local_tip": "In Delhi, place uncontaminated paper tissues in the green MCD wet waste bin for composting, or use the general waste bin if soiled."
+      }
+    ]
+  },
+  {
+    "timestamp": "20261123_161643",
+    "city": "Delhi",
+    "image": "scan_20261123_161643.jpg",
+    "results": [
+      {
+        "item": "smartphone case",
+        "category": "Recycle",
+        "box_2d": [
+          316,
+          331,
+          856,
+          982
+        ],
+        "reason": "Electronic accessory made of plastic and silicone compounds.",
+        "reuse_ideas": [
+          "Use as a mini palette for mixing craft paints",
+          "Attach magnets to the back for a fridge note holder",
+          "Use as a protective mat for hot glue guns"
+        ],
+        "where_to_dispose": [
+          "E-waste recycling center",
+          "Municipal dry waste bin",
+          "Electronics retailer drop-off box"
+        ],
+        "local_tip": "In Delhi, e-waste and plastic accessories can be handed over to authorized recyclers or kabadiwalas for safe processing."
+      }
+    ]
+  },
+  {
+    "timestamp": "20261123_161815",
+    "city": "Delhi",
+    "image": "scan_20261123_161815.jpg",
+    "results": [
+      {
+        "item": "plastic holder",
+        "category": "Recycle",
+        "box_2d": [
+          665,
+          404,
+          946,
+          755
+        ],
+        "reason": "Made of rigid plastic which can be recycled at dedicated plastic collection facilities.",
+        "reuse_ideas": [
+          "Use as a small desk organizer for paperclips",
+          "Use as a drawer divider for small craft items",
+          "Use as a seed starting tray for small sprouts"
+        ],
+        "where_to_dispose": [
+          "Dry waste bin",
+          "Local radiowala / kabadiwala",
+          "Municipal plastic recycling drop-off center"
+        ],
+        "local_tip": "Hand it over to the local kabadiwala or Delhi municipal door-to-door dry waste collector for proper plastic segregation."
+      }
+    ]
+  },
+  {
+    "timestamp": "20261123_162013",
+    "city": "Delhi",
+    "image": "scan_20261123_162013.jpg",
+    "results": [
+      {
+        "item": "Whiteboard Eraser (Duster)",
+        "category": "Reuse",
+        "box_2d": [
+          548,
+          422,
+          861,
+          780
+        ],
+        "reason": "Whiteboard erasers are made of mixed materials (plastic, foam, and felt) that are difficult to separate for recycling, making reuse the best option.",
+        "reuse_ideas": [
+          "Glue a new piece of felt onto the bottom to extend its life",
+          "Use it as a dry dusting brush for delicate surfaces or keyboards",
+          "Repurpose the foam and plastic base for DIY craft or stamp projects"
+        ],
+        "where_to_dispose": [
+          "Dry Waste Bin (Blue Bin)",
+          "Local Kabadiwala (if plastic casing is separated)",
+          "Municipal Solid Waste Collection"
+        ],
+        "local_tip": "In Delhi, if the duster is completely worn out, place it in the blue dry waste bin for MCD collection, or donate functional ones to local NGOs like Goonj for school supply drives."
+      }
+    ]
   }
 ]
