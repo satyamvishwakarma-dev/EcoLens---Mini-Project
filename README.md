@@ -7,17 +7,15 @@
 
 ## 📃 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Running the Application](#running-the-application)
-- [API Endpoints](#api-endpoints)
-- [Voice Commands](#voice-commands)
-- [Project Structure](#project-structure)
-- [License](#license)
-
+- [Overview](#-overview)
+- [Features](#-features)
+- [Prerequisites](#-prerequisites)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [Running the Application](#-running-the-application)
+- [API Endpoints](#-api-endpoints)
+- [Voice Commands](#-voice-commands)
+- [Project Structure](#-project-structure)
 ---
 
 ## 📖 Overview
